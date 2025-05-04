@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class LibmanageApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LibmanageApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LibmanageApplication.class, args);
+    }
 
 }
