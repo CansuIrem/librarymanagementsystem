@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
+@Data
 public class BookDTO {
     private UUID id;
 

@@ -19,4 +19,3 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
 
     Page<Book> findByGenreContainingIgnoreCase(String genre, Pageable pageable);
 }
-
