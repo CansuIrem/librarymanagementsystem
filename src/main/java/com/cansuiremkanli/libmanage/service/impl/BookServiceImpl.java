@@ -1,17 +1,15 @@
-package com.cansuiremkanli.libmanage.service;
+package com.cansuiremkanli.libmanage.service.impl;
 
 import com.cansuiremkanli.libmanage.data.dto.BookDTO;
 import com.cansuiremkanli.libmanage.data.entity.Book;
 import com.cansuiremkanli.libmanage.data.mapper.BookMapper;
 import com.cansuiremkanli.libmanage.data.repository.BookRepository;
+import com.cansuiremkanli.libmanage.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
@@ -51,21 +49,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookDTO> searchBooks(String keyword, String type, Pageable pageable) {
-        switch (type.toLowerCase()) {
-            case "title":
-                return bookRepository.findByTitleContainingIgnoreCase(keyword, pageable)
-                        .map(bookMapper::toDTO);
-            case "author":
-                return bookRepository.findByAuthorContainingIgnoreCase(keyword, pageable)
-                        .map(bookMapper::toDTO);
-            case "isbn":
-                return bookRepository.findByIsbnContainingIgnoreCase(keyword, pageable)
-                        .map(bookMapper::toDTO);
-            case "genre":
-                return bookRepository.findByGenreContainingIgnoreCase(keyword, pageable)
-                        .map(bookMapper::toDTO);
-            default:
-                throw new IllegalArgumentException("Invalid search type");
-        }
+        return switch (type.toLowerCase()) {
+            case "title" -> bookRepository.findByTitleContainingIgnoreCase(keyword, pageable)
+                    .map(bookMapper::toDTO);
+            case "author" -> bookRepository.findByAuthorContainingIgnoreCase(keyword, pageable)
+                    .map(bookMapper::toDTO);
+            case "isbn" -> bookRepository.findByIsbnContainingIgnoreCase(keyword, pageable)
+                    .map(bookMapper::toDTO);
+            case "genre" -> bookRepository.findByGenreContainingIgnoreCase(keyword, pageable)
+                    .map(bookMapper::toDTO);
+            default -> throw new IllegalArgumentException("Invalid search type");
+        };
     }
 }
