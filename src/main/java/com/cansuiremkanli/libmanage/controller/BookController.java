@@ -4,6 +4,7 @@ import com.cansuiremkanli.libmanage.data.dto.BookDTO;
 import com.cansuiremkanli.libmanage.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,14 +25,15 @@ public class BookController {
     @PreAuthorize("hasRole('LIBRARIAN')")
     @Operation(summary = "Add a Book", description = "Adds a new book to the library")
     @PostMapping
-    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> addBook(@Valid @RequestBody BookDTO bookDTO)
+    {
         return ResponseEntity.ok(bookService.addBook(bookDTO));
     }
 
     @PreAuthorize("hasRole('LIBRARIAN')")
     @Operation(summary = "Update a Book", description = "Updates book information by ID")
     @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable UUID id, @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> updateBook(@PathVariable UUID id, @Valid @RequestBody BookDTO bookDTO) {
         return ResponseEntity.ok(bookService.updateBook(id, bookDTO));
     }
 

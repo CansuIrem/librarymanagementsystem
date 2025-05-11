@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface BorrowingRepository extends JpaRepository<Borrowing, UUID> {
     List<Borrowing> findByUserId(UUID userId);
     List<Borrowing> findByIsOverdueTrue();
+    Long countByUserIdAndReturnDateIsNull(UUID userId);
+    Boolean existsByUserIdAndIsOverdueTrue(UUID userId);
 }

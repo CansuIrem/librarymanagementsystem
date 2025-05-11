@@ -33,11 +33,22 @@ public class BorrowingServiceImpl implements BorrowingService {
     public BorrowingDTO borrowBook(UUID userId, UUID bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found"));
 
         if (book.getAvailableCount() <= 0) {
             throw new IllegalStateException("Book is not available for borrowing.");
+        }
+
+        long activeBorrowings = borrowingRepository.countByUserIdAndReturnDateIsNull(userId);
+        if (activeBorrowings >= 5) {
+            throw new IllegalStateException("User has reached the maximum number of active borrowings.");
+        }
+
+        boolean hasOverdue = borrowingRepository.existsByUserIdAndIsOverdueTrue(userId);
+        if (hasOverdue) {
+            throw new IllegalStateException("User has overdue books and cannot borrow new ones.");
         }
 
         Borrowing borrowing = new Borrowing();
@@ -54,6 +65,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
         return borrowingMapper.toDTO(borrowing);
     }
+
 
     @Override
     public BorrowingDTO returnBook(UUID borrowingId) {
