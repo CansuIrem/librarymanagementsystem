@@ -4,6 +4,7 @@ import com.cansuiremkanli.libmanage.data.dto.BookDTO;
 import com.cansuiremkanli.libmanage.data.entity.Book;
 import com.cansuiremkanli.libmanage.data.mapper.BookMapper;
 import com.cansuiremkanli.libmanage.data.repository.BookRepository;
+import com.cansuiremkanli.libmanage.publisher.BookStockPublisher;
 import com.cansuiremkanli.libmanage.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final BookStockPublisher bookStockPublisher;
 
     @Override
     public BookDTO addBook(BookDTO bookDTO) {
@@ -29,10 +31,14 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDTO updateBook(UUID id, BookDTO bookDTO) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+        book.setAvailableCount(bookDTO.getAvailableCount());
 
-        bookMapper.updateEntity(bookDTO, book);
-        return bookMapper.toDTO(bookRepository.save(book));
+        bookRepository.save(book);
+
+        BookDTO updatedDTO = bookMapper.toDTO(book);
+        bookStockPublisher.publish(updatedDTO);
+        return updatedDTO;
     }
 
     @Override

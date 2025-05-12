@@ -5,6 +5,7 @@ import com.cansuiremkanli.libmanage.data.dto.BookDTO;
 import com.cansuiremkanli.libmanage.data.entity.Book;
 import com.cansuiremkanli.libmanage.data.mapper.BookMapper;
 import com.cansuiremkanli.libmanage.data.repository.BookRepository;
+import com.cansuiremkanli.libmanage.publisher.BookStockPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -29,6 +30,10 @@ class BookServiceImplTest {
 
     @Mock
     private BookMapper bookMapper;
+
+    @Mock
+    private BookStockPublisher bookStockPublisher;
+
 
     @BeforeEach
     void setUp() {
