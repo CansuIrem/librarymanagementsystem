@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -21,12 +24,14 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Register new user", description = "Registers a new user and returns JWT token.")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+        log.info("Register request received for email: {}", request.getEmail());
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticates a user and returns JWT token.")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+        log.info("Login request received for email: {}", request.getEmail());
         return ResponseEntity.ok(authService.authenticate(request));
     }
 }

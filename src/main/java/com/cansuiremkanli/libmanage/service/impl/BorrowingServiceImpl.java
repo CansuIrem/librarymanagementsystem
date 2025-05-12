@@ -13,6 +13,7 @@ import com.cansuiremkanli.libmanage.data.mapper.BorrowingMapper;
 import com.cansuiremkanli.libmanage.service.BorrowingService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BorrowingServiceImpl implements BorrowingService {
@@ -31,23 +33,34 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Override
     public BorrowingDTO borrowBook(UUID userId, UUID bookId) {
+        log.info("Borrow request: userId={}, bookId={}", userId, bookId);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("User not found with ID: {}", userId);
+                    return new EntityNotFoundException("User not found");
+                });
 
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+                .orElseThrow(() -> {
+                    log.warn("Book not found with ID: {}", bookId);
+                    return new EntityNotFoundException("Book not found");
+                });
 
         if (book.getAvailableCount() <= 0) {
+            log.warn("Book [{}] is not available for borrowing", bookId);
             throw new IllegalStateException("Book is not available for borrowing.");
         }
 
         long activeBorrowings = borrowingRepository.countByUserIdAndReturnDateIsNull(userId);
         if (activeBorrowings >= 5) {
+            log.warn("User [{}] exceeded active borrowing limit", userId);
             throw new IllegalStateException("User has reached the maximum number of active borrowings.");
         }
 
         boolean hasOverdue = borrowingRepository.existsByUserIdAndIsOverdueTrue(userId);
         if (hasOverdue) {
+            log.warn("User [{}] has overdue books", userId);
             throw new IllegalStateException("User has overdue books and cannot borrow new ones.");
         }
 
@@ -63,16 +76,23 @@ public class BorrowingServiceImpl implements BorrowingService {
         bookRepository.save(book);
         borrowingRepository.save(borrowing);
 
+        log.info("Borrowing created successfully for user [{}] and book [{}]", userId, bookId);
+
         return borrowingMapper.toDTO(borrowing);
     }
 
-
     @Override
     public BorrowingDTO returnBook(UUID borrowingId) {
+        log.info("Return request for borrowingId={}", borrowingId);
+
         Borrowing borrowing = borrowingRepository.findById(borrowingId)
-                .orElseThrow(() -> new EntityNotFoundException("Borrowing not found"));
+                .orElseThrow(() -> {
+                    log.warn("Borrowing not found with ID: {}", borrowingId);
+                    return new EntityNotFoundException("Borrowing not found");
+                });
 
         if (borrowing.getReturnDate() != null) {
+            log.warn("Attempted to return already returned borrowingId={}", borrowingId);
             throw new IllegalStateException("Book already returned");
         }
 
@@ -85,11 +105,14 @@ public class BorrowingServiceImpl implements BorrowingService {
         bookRepository.save(book);
         borrowingRepository.save(borrowing);
 
+        log.info("Book returned successfully. borrowingId={}, overdue={}", borrowingId, borrowing.isOverdue());
+
         return borrowingMapper.toDTO(borrowing);
     }
 
     @Override
     public List<BorrowingDTO> getUserBorrowingHistory(UUID userId) {
+        log.info("Fetching borrowing history for user [{}]", userId);
         return borrowingRepository.findByUserId(userId)
                 .stream()
                 .map(borrowingMapper::toDTO)
@@ -98,6 +121,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Override
     public List<BorrowingDTO> getAllOverdueBooks() {
+        log.info("Fetching all overdue borrowings");
         return borrowingRepository.findByIsOverdueTrue()
                 .stream()
                 .map(borrowingMapper::toDTO)
@@ -106,8 +130,10 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Override
     public void updateOverdueStatuses() {
+        log.info("Updating overdue statuses for all borrowings");
         List<Borrowing> borrowings = borrowingRepository.findAll();
 
+        int updatedCount = 0;
         for (Borrowing borrowing : borrowings) {
             boolean shouldBeOverdue = borrowing.getReturnDate() == null
                     && borrowing.getDueDate().isBefore(LocalDate.now());
@@ -115,11 +141,16 @@ public class BorrowingServiceImpl implements BorrowingService {
             if (shouldBeOverdue && !borrowing.isOverdue()) {
                 borrowing.setOverdue(true);
                 borrowingRepository.save(borrowing);
+                updatedCount++;
             }
         }
+
+        log.info("Overdue status update completed. Updated {} borrowings.", updatedCount);
     }
+
     @Override
     public List<BorrowingReportDTO> getOverdueReport() {
+        log.info("Generating overdue borrowings report");
         return borrowingRepository.findByIsOverdueTrue()
                 .stream()
                 .map(borrowing -> {
@@ -136,6 +167,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Override
     public BorrowingStatsDTO getBorrowingStats() {
+        log.info("Generating borrowing statistics");
         List<Borrowing> all = borrowingRepository.findAll();
         long total = all.size();
         long active = all.stream().filter(b -> b.getReturnDate() == null).count();
@@ -147,8 +179,10 @@ public class BorrowingServiceImpl implements BorrowingService {
         stats.setActiveBorrowings(active);
         stats.setOverdueCount(overdue);
         stats.setOverduePercentage(Math.round(percentage * 100.0) / 100.0);
+
+        log.info("Borrowing stats -> Total: {}, Active: {}, Overdue: {}, Overdue%: {}",
+                total, active, overdue, stats.getOverduePercentage());
+
         return stats;
     }
-
-
 }
