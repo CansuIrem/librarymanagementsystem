@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,7 +90,7 @@ class UserServiceImplTest {
         List<UserDTO> result = userService.getAllUsers();
 
         assertEquals(1, result.size());
-        assertEquals(userDTOs.get(0), result.get(0));
+        assertEquals(userDTOs.getFirst(), result.getFirst());
     }
 
 
@@ -109,8 +108,24 @@ class UserServiceImplTest {
 
 
     @Test
-    void testDeleteUser() {
+    void testDeleteUser_WhenUserExists_ShouldCallDelete() {
+        UUID userId = UUID.randomUUID();
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+
         userService.deleteUser(userId);
+
         verify(userRepository).deleteById(userId);
+    }
+
+    @Test
+    void testDeleteUser_WhenUserDoesNotExist_ShouldThrowException() {
+        UUID userId = UUID.randomUUID();
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteUser(userId));
+
+        verify(userRepository, never()).deleteById(any());
     }
 }
