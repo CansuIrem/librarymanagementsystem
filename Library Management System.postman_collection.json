@@ -1,0 +1,616 @@
+{
+	"info": {
+		"_postman_id": "814ce2c4-bc88-45ed-aab7-2810f73ac188",
+		"name": "Library Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39520593"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"irem\",\n  \"email\": \"irem@mail.com\",\n  \"password\": \"1234567\",\n  \"phoneNumber\": \"1234567\",\n  \"role\": \"LIBRARIAN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Information",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd\",\n  \"name\": \"Updated Patron\",\n  \"email\": \"patron@mail.com\",\n  \"phoneNumber\": \"+4715934135961\",\n  \"role\": \"PATRON\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/9087e1b4-3ab2-47c2-9485-d2030cae3b7d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"9087e1b4-3ab2-47c2-9485-d2030cae3b7d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a New User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI3MzAzLCJleHAiOjE3NDcxMzA5MDN9.hWmjczNPrKjVfTRjenD_VZ5A8I2ALeAH7oaBznHGVI8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"cansu\",\n  \"email\": \"cansu@mail.com\",\n  \"phoneNumber\": \"53072284272\",\n  \"role\": \"PATRON\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Borrowing Management",
+			"item": [
+				{
+					"name": "Borrow a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrowings/borrow?userId=2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd&bookId=1ea8bd07-7218-4727-9cd9-47327798d80f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrowings",
+								"borrow"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd"
+								},
+								{
+									"key": "bookId",
+									"value": "1ea8bd07-7218-4727-9cd9-47327798d80f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Return a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXRyb25AbWFpbC5jb20iLCJpYXQiOjE3NDcxMzI1MjQsImV4cCI6MTc0NzEzNjEyNH0.nPoj57Z9VU-v3Vi9vWfWrOseVk8L4HyZMqjJbFAxMsI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrowings/return/60f52e1d-df5f-46f7-8d13-a2d9ee0c0842",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrowings",
+								"return",
+								"60f52e1d-df5f-46f7-8d13-a2d9ee0c0842"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Borrowing History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXRyb25AbWFpbC5jb20iLCJpYXQiOjE3NDcxMzI1MjQsImV4cCI6MTc0NzEzNjEyNH0.nPoj57Z9VU-v3Vi9vWfWrOseVk8L4HyZMqjJbFAxMsI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrowings/user/2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrowings",
+								"user",
+								"2aa7bd23-f5c2-48e8-8bba-e52addf4cdcd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrowing Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Overdue Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrowings/overdue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrowings",
+								"overdue"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Overdue Borrowings Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXRyb25AbWFpbC5jb20iLCJpYXQiOjE3NDcxMzI1MjQsImV4cCI6MTc0NzEzNjEyNH0.nPoj57Z9VU-v3Vi9vWfWrOseVk8L4HyZMqjJbFAxMsI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/borrowings/overdue/report",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"borrowings",
+								"overdue",
+								"report"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reactive Book Management",
+			"item": [
+				{
+					"name": "Get All Books With Reactive",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Book Management",
+			"item": [
+				{
+					"name": "Add a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Test Book\",\n  \"author\": \"Test Author\",\n  \"isbn\": \"1093374367170\",\n  \"genre\": \"Novel\",\n  \"publicationDate\": \"2025-05-13\",\n  \"availableCount\": 10,\n  \"totalCount\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/books",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"1ea8bd07-7218-4727-9cd9-47327798d80f\",\n  \"title\": \"Test Book\",\n  \"author\": \"Test Author\",\n  \"isbn\": \"1093374367170\",\n  \"genre\": \"Novel\",\n  \"publicationDate\": \"2025-05-13\",\n  \"availableCount\": 11,\n  \"totalCount\": 11\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/books/1ea8bd07-7218-4727-9cd9-47327798d80f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"1ea8bd07-7218-4727-9cd9-47327798d80f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Book",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/1ea8bd07-7218-4727-9cd9-47327798d80f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"1ea8bd07-7218-4727-9cd9-47327798d80f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Books",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/search?keyword=Test&type=title&page=0&size=1\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"search"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "Test"
+								},
+								{
+									"key": "type",
+									"value": "title"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "1\n"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpcmVtQG1haWwuY29tIiwiaWF0IjoxNzQ3MTI5NTI3LCJleHAiOjE3NDcxMzMxMjd9.MWghCTnCbuk-S_XDoPeEgQmn2GQJRGyhc02zIVTso_Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/books/1ea8bd07-7218-4727-9cd9-47327798d80f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"books",
+								"1ea8bd07-7218-4727-9cd9-47327798d80f"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
