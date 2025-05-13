@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied. " + ex.getMessage().replaceAll("\\s+", " ")));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied. " + ex.getMessage()));
     }
 
     @ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class })

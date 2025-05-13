@@ -1,8 +1,6 @@
 package com.cansuiremkanli.libmanage.controller;
 
 import com.cansuiremkanli.libmanage.data.dto.BorrowingDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingReportDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingStatsDTO;
 import com.cansuiremkanli.libmanage.service.BorrowingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,7 +58,7 @@ public class BorrowingController {
     @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/overdue/report")
     @Operation(summary = "Overdue Borrowings Report", description = "Lists all overdue borrowings with user and book details")
-    public ResponseEntity<List<BorrowingReportDTO>> getOverdueReport() {
+    public ResponseEntity<String> getOverdueReport() {
         log.info("Generating overdue borrowings report");
         return ResponseEntity.ok(borrowingService.getOverdueReport());
     }
@@ -68,7 +66,7 @@ public class BorrowingController {
     @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/stats")
     @Operation(summary = "Borrowing Statistics", description = "Provides statistics about all borrowings in the system")
-    public ResponseEntity<BorrowingStatsDTO> getBorrowingStats() {
+    public ResponseEntity<String> getBorrowingStats() {
         log.info("Fetching borrowing statistics");
         return ResponseEntity.ok(borrowingService.getBorrowingStats());
     }

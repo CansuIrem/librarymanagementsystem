@@ -2,8 +2,6 @@
 package com.cansuiremkanli.libmanage.controller;
 
 import com.cansuiremkanli.libmanage.data.dto.BorrowingDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingReportDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingStatsDTO;
 import com.cansuiremkanli.libmanage.service.BorrowingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,19 +9,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -82,16 +79,49 @@ class BorrowingControllerTest {
     @WithMockUser(roles = "LIBRARIAN")
     @Test
     void testGetOverdueReport() throws Exception {
-        Mockito.when(borrowingService.getOverdueReport()).thenReturn(List.of(new BorrowingReportDTO()));
+        String dummyReport = """
+            OVERDUE BORROWING REPORT
+            ----------------------------
+            Total Overdue: 1
+
+            Borrowing ID: 1234
+            User: Test User (test@example.com)
+            Book Title: Test Book
+            Due Date: 2025-05-15
+            ----------------------------
+            Last Updated: 2025-05-13T12:00:00
+            """;
+
+        Mockito.when(borrowingService.getOverdueReport()).thenReturn(dummyReport);
+
         mockMvc.perform(get("/api/borrowings/overdue/report"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("OVERDUE BORROWING REPORT")))
+                .andExpect(content().string(containsString("Total Overdue: 1")));
     }
+
 
     @WithMockUser(roles = "LIBRARIAN")
     @Test
     void testGetBorrowingStats() throws Exception {
-        Mockito.when(borrowingService.getBorrowingStats()).thenReturn(new BorrowingStatsDTO());
+        String dummyReport = """
+        BORROWING STATISTICS REPORT
+        ---------------------------
+        Total Borrowings: 10
+        Active Borrowings: 4
+        Overdue Borrowings: 2
+        Overdue Percentage: 20.00%
+        
+        Last Updated: 2025-05-13T12:00:00
+        """;
+
+        Mockito.when(borrowingService.getBorrowingStats()).thenReturn(dummyReport);
+
         mockMvc.perform(get("/api/borrowings/stats"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("BORROWING STATISTICS REPORT")))
+                .andExpect(content().string(containsString("Total Borrowings: 10")))
+                .andExpect(content().string(containsString("Overdue Percentage: 20.00%")));
     }
+
 }

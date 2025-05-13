@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -164,21 +165,23 @@ class BorrowingControllerIntegrationTest {
         mockMvc.perform(get("/api/borrowings/overdue/report")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(content().string(containsString("OVERDUE BORROWING REPORT")))
+                .andExpect(content().string(containsString("Total Overdue: 0")));
     }
 
+
     @Test
-    void getBorrowingStats_AsLibrarian_ShouldReturnValidStats() throws Exception {
+    void getBorrowingStats_AsLibrarian_ShouldReturnTextReport() throws Exception {
         String token = registerAndGetToken("librarian@stats.com", "LIBRARIAN");
 
         mockMvc.perform(get("/api/borrowings/stats")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalBorrowings").isNumber())
-                .andExpect(jsonPath("$.activeBorrowings").isNumber())
-                .andExpect(jsonPath("$.overdueCount").isNumber())
-                .andExpect(jsonPath("$.overduePercentage").isNumber());
+                .andExpect(content().string(containsString("BORROWING STATISTICS REPORT")))
+                .andExpect(content().string(containsString("Total Borrowings:")))
+                .andExpect(content().string(containsString("Overdue Percentage:")));
     }
+
 
     @Test
     void borrowBook_WhenUserHasFiveActiveBorrowings_ShouldReturn409() throws Exception {
@@ -280,11 +283,10 @@ class BorrowingControllerIntegrationTest {
     }
 
     @Test
-    void getBorrowingStats_ShouldCalculateCorrectly() throws Exception {
+    void getBorrowingStats_ShouldReturnCorrectReportText() throws Exception {
         String token = registerAndGetToken("statlib@example.com", "LIBRARIAN");
         User user = userRepository.findByEmail("statlib@example.com").orElseThrow();
 
-        // Kitaplar
         UUID book1 = createBook("Returned Book", 1);
         UUID book2 = createBook("Active Book", 1);
         UUID book3 = createBook("Overdue Book", 1);
@@ -324,7 +326,7 @@ class BorrowingControllerIntegrationTest {
         borrowingRepository.save(br2);
         borrowingRepository.save(br3);
 
-        // İstatistik endpointi
+        // İstatistik endpointi çağrılır
         MvcResult result = mockMvc.perform(get("/api/borrowings/stats")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -332,15 +334,13 @@ class BorrowingControllerIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        double percentage = objectMapper.readTree(responseBody).get("overduePercentage").asDouble();
-        long total = objectMapper.readTree(responseBody).get("totalBorrowings").asLong();
-        long active = objectMapper.readTree(responseBody).get("activeBorrowings").asLong();
-        long overdue = objectMapper.readTree(responseBody).get("overdueCount").asLong();
-
-        assertThat(total).isEqualTo(3);
-        assertThat(active).isEqualTo(2);
-        assertThat(overdue).isEqualTo(1);
-        assertThat(percentage).isEqualTo(33.33);
+        // İçerik kontrolü
+        assertThat(responseBody).contains("BORROWING STATISTICS REPORT");
+        assertThat(responseBody).contains("Total Borrowings: 3");
+        assertThat(responseBody).contains("Active Borrowings: 2");
+        assertThat(responseBody).contains("Overdue Borrowings: 1");
+        assertThat(responseBody).contains("Overdue Percentage: 33.33%");
     }
+
 
 }

@@ -1,7 +1,5 @@
 package com.cansuiremkanli.libmanage.service.impl;
 
-import com.cansuiremkanli.libmanage.data.dto.BorrowingReportDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingStatsDTO;
 import com.cansuiremkanli.libmanage.data.entity.Book;
 import com.cansuiremkanli.libmanage.data.entity.Borrowing;
 import com.cansuiremkanli.libmanage.data.entity.User;
@@ -17,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -149,40 +149,52 @@ public class BorrowingServiceImpl implements BorrowingService {
     }
 
     @Override
-    public List<BorrowingReportDTO> getOverdueReport() {
-        log.info("Generating overdue borrowings report");
-        return borrowingRepository.findByIsOverdueTrue()
-                .stream()
-                .map(borrowing -> {
-                    BorrowingReportDTO dto = new BorrowingReportDTO();
-                    dto.setBorrowingId(borrowing.getId());
-                    dto.setUserName(borrowing.getUser().getName());
-                    dto.setUserEmail(borrowing.getUser().getEmail());
-                    dto.setBookTitle(borrowing.getBook().getTitle());
-                    dto.setDueDate(borrowing.getDueDate());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    public String getOverdueReport() {
+        List<Borrowing> overdueBorrowings = borrowingRepository.findByIsOverdueTrue();
+
+        StringBuilder report = new StringBuilder();
+        report.append("OVERDUE BORROWING REPORT\n")
+                .append("----------------------------\n")
+                .append("Total Overdue: ").append(overdueBorrowings.size()).append("\n\n");
+
+        for (Borrowing borrowing : overdueBorrowings) {
+            report.append("Borrowing ID: ").append(borrowing.getId()).append("\n")
+                    .append("User: ").append(borrowing.getUser().getName())
+                    .append(" (").append(borrowing.getUser().getEmail()).append(")\n")
+                    .append("Book Title: ").append(borrowing.getBook().getTitle()).append("\n")
+                    .append("Due Date: ").append(borrowing.getDueDate()).append("\n")
+                    .append("----------------------------\n");
+        }
+
+        report.append("Last Updated: ").append(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        return report.toString();
     }
 
+
     @Override
-    public BorrowingStatsDTO getBorrowingStats() {
-        log.info("Generating borrowing statistics");
+    public String getBorrowingStats() {
         List<Borrowing> all = borrowingRepository.findAll();
         long total = all.size();
         long active = all.stream().filter(b -> b.getReturnDate() == null).count();
         long overdue = all.stream().filter(Borrowing::isOverdue).count();
         double percentage = total == 0 ? 0 : (double) overdue / total * 100;
 
-        BorrowingStatsDTO stats = new BorrowingStatsDTO();
-        stats.setTotalBorrowings(total);
-        stats.setActiveBorrowings(active);
-        stats.setOverdueCount(overdue);
-        stats.setOverduePercentage(Math.round(percentage * 100.0) / 100.0);
-
-        log.info("Borrowing stats -> Total: {}, Active: {}, Overdue: {}, Overdue%: {}",
-                total, active, overdue, stats.getOverduePercentage());
-
-        return stats;
+        return """
+            BORROWING STATISTICS REPORT
+            ---------------------------
+            Total Borrowings: %d
+            Active Borrowings: %d
+            Overdue Borrowings: %d
+            Overdue Percentage: %.2f%%
+            
+            Last Updated: %s
+            """.formatted(
+                total,
+                active,
+                overdue,
+                Math.round(percentage * 100.0) / 100.0,
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        );
     }
+
 }

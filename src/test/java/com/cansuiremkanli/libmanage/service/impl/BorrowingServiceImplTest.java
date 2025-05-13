@@ -2,8 +2,6 @@
 package com.cansuiremkanli.libmanage.service.impl;
 
 import com.cansuiremkanli.libmanage.data.dto.BorrowingDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingReportDTO;
-import com.cansuiremkanli.libmanage.data.dto.BorrowingStatsDTO;
 import com.cansuiremkanli.libmanage.data.entity.Book;
 import com.cansuiremkanli.libmanage.data.entity.Borrowing;
 import com.cansuiremkanli.libmanage.data.entity.User;
@@ -11,7 +9,6 @@ import com.cansuiremkanli.libmanage.data.mapper.BorrowingMapper;
 import com.cansuiremkanli.libmanage.data.repository.BookRepository;
 import com.cansuiremkanli.libmanage.data.repository.BorrowingRepository;
 import com.cansuiremkanli.libmanage.data.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -125,7 +122,7 @@ class BorrowingServiceImplTest {
     }
 
     @Test
-    void testGetOverdueReport_returnsProperDTOs() {
+    void testGetOverdueReport_returnsFormattedReport() {
         User user = new User();
         user.setName("Test User");
         user.setEmail("test@example.com");
@@ -142,30 +139,36 @@ class BorrowingServiceImplTest {
 
         when(borrowingRepository.findByIsOverdueTrue()).thenReturn(List.of(borrowing));
 
-        List<BorrowingReportDTO> report = borrowingService.getOverdueReport();
+        String report = borrowingService.getOverdueReport();
 
-        assertEquals(1, report.size());
-        assertEquals("Test User", report.get(0).getUserName());
-        assertEquals("Test Book", report.get(0).getBookTitle());
+        assertNotNull(report);
+        assertTrue(report.contains("Test User"));
+        assertTrue(report.contains("test@example.com"));
+        assertTrue(report.contains("Test Book"));
+        assertTrue(report.contains("OVERDUE BORROWING REPORT"));
+        assertTrue(report.contains("Total Overdue: 1"));
     }
 
     @Test
-    void testGetBorrowingStats_returnsCorrectValues() {
+    void testGenerateBorrowingStatsReport_returnsCorrectValuesInReport() {
         Borrowing b1 = new Borrowing();
-        b1.setReturnDate(null);
-        b1.setOverdue(true);
+        b1.setReturnDate(null);       // aktif
+        b1.setOverdue(true);          // gecikmiş
 
         Borrowing b2 = new Borrowing();
-        b2.setReturnDate(LocalDate.now());
-        b2.setOverdue(false);
+        b2.setReturnDate(LocalDate.now()); // iade edilmiş
+        b2.setOverdue(false);              // zamanında
 
         when(borrowingRepository.findAll()).thenReturn(List.of(b1, b2));
 
-        BorrowingStatsDTO stats = borrowingService.getBorrowingStats();
+        String report = borrowingService.getBorrowingStats();
 
-        assertEquals(2, stats.getTotalBorrowings());
-        assertEquals(1, stats.getActiveBorrowings());
-        assertEquals(1, stats.getOverdueCount());
-        assertEquals(50.0, stats.getOverduePercentage());
+        assertNotNull(report);
+        assertTrue(report.contains("BORROWING STATISTICS REPORT"));
+        assertTrue(report.contains("Total Borrowings: 2"));
+        assertTrue(report.contains("Active Borrowings: 1"));
+        assertTrue(report.contains("Overdue Borrowings: 1"));
+        assertTrue(report.contains("Overdue Percentage: 50.0"));
     }
+
 }
