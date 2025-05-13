@@ -151,7 +151,7 @@ You can interact with the endpoints and explore request/response schemas using t
 ### 🔗 Swagger UI
 - [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 ### 🔗 Postman Collection
-- You can import the postman collection from the `Library Management System.postman_collection.json` file which can be found at the projects root directory.
+- You can import the postman collection from the `Library Management System.postman_collection.json` file which can be found at the root directory of the project.
 
 ---
 
