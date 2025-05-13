@@ -298,10 +298,9 @@ The application enforces several domain-specific business rules to ensure consis
 | 📚 A user cannot borrow more than **5 books** at the same time. |
 | 📕 A book cannot be borrowed if `availableCount` is **0**. |
 | ➕ When adding or updating a book, `availableCount` **cannot exceed** `totalCount`. |
-| 🔁 A user cannot borrow the **same book more than once** before returning it. |
 | 🛑 Only **librarians** can create, update, or delete users and books. |
 | ✅ Authentication is required for **all operations**, except `/auth/register` and `/auth/login`. |
-| ⏱️ Overdue status is automatically calculated based on `dueDate` and `returnDate`. |
+| ⏱️ Overdue status is automatically calculated based on `dueDate` and `returnDate` and overDue day count is `14`. |
 | 📄 Borrowing reports and statistics are only accessible to users with the `LIBRARIAN` role. |
 
 These rules are enforced through service-layer validation and custom exception handling.
