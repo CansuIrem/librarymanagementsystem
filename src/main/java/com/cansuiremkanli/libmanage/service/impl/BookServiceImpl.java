@@ -26,6 +26,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDTO addBook(BookDTO bookDTO) {
         log.info("Adding new book: {}", bookDTO.getTitle());
+
+        validateBookCounts(bookDTO);
+
         Book book = bookMapper.toEntity(bookDTO);
         Book saved = bookRepository.save(book);
         log.info("Book added successfully with ID: {}", saved.getId());
@@ -42,10 +45,13 @@ public class BookServiceImpl implements BookService {
                     return new RuntimeException("Book not found with id: " + id);
                 });
 
-        book.setAvailableCount(bookDTO.getAvailableCount());
-        Book updated = bookRepository.save(book);
+        validateBookCounts(bookDTO);
 
-        log.info("Book updated successfully: ID={}, AvailableCount={}", updated.getId(), updated.getAvailableCount());
+        Book updatedBook = bookMapper.toEntity(bookDTO);
+        updatedBook.setId(book.getId());
+        Book updated = bookRepository.save(updatedBook);
+
+        log.info("Book updated successfully: ID={}, AvailableCount={}, TotalCount={}", updated.getId(), updated.getAvailableCount(), updated.getTotalCount());
 
         BookDTO updatedDTO = bookMapper.toDTO(updated);
         bookStockPublisher.publish(updatedDTO);
@@ -101,5 +107,13 @@ public class BookServiceImpl implements BookService {
                 throw new IllegalArgumentException("Invalid search type");
             }
         };
+    }
+
+    private void validateBookCounts(BookDTO bookDTO) {
+        if (bookDTO.getAvailableCount() > bookDTO.getTotalCount()) {
+            log.error("Validation failed: AvailableCount ({}) cannot exceed TotalCount ({})",
+                    bookDTO.getAvailableCount(), bookDTO.getTotalCount());
+            throw new IllegalArgumentException("Available count cannot be greater than total count");
+        }
     }
 }

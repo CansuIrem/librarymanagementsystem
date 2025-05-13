@@ -1,5 +1,6 @@
 package com.cansuiremkanli.libmanage.service.impl;
 
+import com.cansuiremkanli.libmanage.data.dto.UserCreateDTO;
 import com.cansuiremkanli.libmanage.data.entity.User;
 import com.cansuiremkanli.libmanage.data.repository.UserRepository;
 import com.cansuiremkanli.libmanage.data.dto.UserDTO;
@@ -24,16 +25,15 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        log.info("Creating new user with email: {}", userDTO.getEmail());
+    public UserDTO createUser(UserCreateDTO userCreateDTO) {
+        User user = userMapper.toEntity(userCreateDTO);
+        user.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
 
-        User user = userMapper.toEntity(userDTO);
-        user.setPassword(passwordEncoder.encode("defaultPassword")); // Öneri: DTO ayrıştırılabilir
-        User savedUser = userRepository.save(user);
-
-        log.info("User created successfully with ID: {}", savedUser.getId());
-        return userMapper.toDto(savedUser);
+        userRepository.save(user);
+        return userMapper.toDto(user);
     }
+
+
 
     @Override
     public UserDTO getUserById(UUID id) {

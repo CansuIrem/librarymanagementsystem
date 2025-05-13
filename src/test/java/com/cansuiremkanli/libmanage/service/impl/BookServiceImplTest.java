@@ -58,18 +58,29 @@ class BookServiceImplTest {
     @Test
     void testUpdateBook() {
         UUID id = UUID.randomUUID();
-        BookDTO dto = new BookDTO();
-        Book book = new Book();
 
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
-        doNothing().when(bookMapper).updateEntity(dto, book);
-        when(bookRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDTO(book)).thenReturn(dto);
+        BookDTO inputDto = new BookDTO();
+        inputDto.setTitle("Updated Title");
 
-        BookDTO result = bookService.updateBook(id, dto);
+        Book bookEntity = new Book();
+        bookEntity.setId(id);
+        bookEntity.setTitle("Updated Title");
 
-        assertEquals(dto, result);
+        BookDTO expectedDto = new BookDTO();
+        expectedDto.setId(id);
+        expectedDto.setTitle("Updated Title");
+
+        when(bookRepository.findById(id)).thenReturn(Optional.of(new Book()));
+        when(bookMapper.toEntity(inputDto)).thenReturn(bookEntity);
+        when(bookRepository.save(bookEntity)).thenReturn(bookEntity);
+        when(bookMapper.toDTO(bookEntity)).thenReturn(expectedDto);
+        doNothing().when(bookStockPublisher).publish(expectedDto);
+
+        BookDTO result = bookService.updateBook(id, inputDto);
+
+        assertEquals(expectedDto, result);
     }
+
 
     @Test
     void testDeleteBook() {

@@ -1,6 +1,8 @@
 
 package com.cansuiremkanli.libmanage.service.impl;
 
+import com.cansuiremkanli.libmanage.core.enums.Role;
+import com.cansuiremkanli.libmanage.data.dto.UserCreateDTO;
 import com.cansuiremkanli.libmanage.data.dto.UserDTO;
 import com.cansuiremkanli.libmanage.data.entity.User;
 import com.cansuiremkanli.libmanage.data.mapper.UserMapper;
@@ -51,15 +53,46 @@ class UserServiceImplTest {
 
     @Test
     void testCreateUser() {
-        when(userMapper.toEntity(userDTO)).thenReturn(user);
-        when(passwordEncoder.encode(any())).thenReturn("encodedPassword"); // şifre encode işlemi
+        // GIVEN
+        UserCreateDTO userCreateDTO = new UserCreateDTO();
+        userCreateDTO.setName("Test User");
+        userCreateDTO.setEmail("test@example.com");
+        userCreateDTO.setPhoneNumber("05551112233");
+        userCreateDTO.setRole(Role.PATRON);
+        userCreateDTO.setPassword("rawPassword");
+
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setName("Test User");
+        user.setEmail("test@example.com");
+        user.setPhoneNumber("05551112233");
+        user.setRole(Role.PATRON);
+        user.setPassword("encodedPassword");
+
+        UserDTO expectedDTO = new UserDTO();
+        expectedDTO.setId(user.getId());
+        expectedDTO.setName("Test User");
+        expectedDTO.setEmail("test@example.com");
+        expectedDTO.setPhoneNumber("05551112233");
+        expectedDTO.setRole(Role.PATRON);
+
+        // WHEN
+        when(userMapper.toEntity(userCreateDTO)).thenReturn(user);
+        when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
         when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.toDto(user)).thenReturn(userDTO);
+        when(userMapper.toDto(user)).thenReturn(expectedDTO);
 
-        UserDTO result = userService.createUser(userDTO);
+        // THEN
+        UserDTO result = userService.createUser(userCreateDTO);
 
-        assertEquals(userDTO, result);
+        assertNotNull(result);
+        assertEquals("Test User", result.getName());
+        assertEquals("test@example.com", result.getEmail());
+        assertEquals("05551112233", result.getPhoneNumber());
+        assertEquals(Role.PATRON, result.getRole());
     }
+
+
 
 
     @Test

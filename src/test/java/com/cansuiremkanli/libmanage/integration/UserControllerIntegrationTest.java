@@ -2,6 +2,7 @@ package com.cansuiremkanli.libmanage.integration;
 
 import com.cansuiremkanli.libmanage.core.enums.Role;
 import com.cansuiremkanli.libmanage.data.dto.RegisterRequest;
+import com.cansuiremkanli.libmanage.data.dto.UserCreateDTO;
 import com.cansuiremkanli.libmanage.data.dto.UserDTO;
 import com.cansuiremkanli.libmanage.data.entity.User;
 import com.cansuiremkanli.libmanage.data.repository.UserRepository;
@@ -60,16 +61,12 @@ class UserControllerIntegrationTest {
     void createUser_WithLibrarianRole_ShouldSucceed() throws Exception {
         String token = registerAndGetToken("librarian@example.com", "LIBRARIAN");
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("New Patron");
-        userDTO.setEmail("newpatron@example.com");
-        userDTO.setPhoneNumber("05551112233");
-        userDTO.setRole(Role.PATRON);
+        UserCreateDTO userCreateDTO = toUserCreateDTO("New User", "newpatron@example.com", "05551112233", Role.PATRON, "password123");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
-                        .content(objectMapper.writeValueAsString(userDTO)))
+                        .content(objectMapper.writeValueAsString(userCreateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("newpatron@example.com"))
                 .andExpect(jsonPath("$.role").value("PATRON"));
@@ -79,16 +76,12 @@ class UserControllerIntegrationTest {
     void createUser_WithPatronRole_ShouldReturn403() throws Exception {
         String token = registerAndGetToken("patron@example.com", "PATRON");
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("Unauthorized Create");
-        userDTO.setEmail("unauthorized@example.com");
-        userDTO.setPhoneNumber("05551112233");
-        userDTO.setRole(Role.PATRON);
+        UserCreateDTO userCreateDTO = toUserCreateDTO("New User", "newpatron@example.com", "05551112233", Role.PATRON, "password123");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
-                        .content(objectMapper.writeValueAsString(userDTO)))
+                        .content(objectMapper.writeValueAsString(userCreateDTO)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Access denied. Access Denied"));
     }
@@ -97,12 +90,7 @@ class UserControllerIntegrationTest {
     void getUser_WithLibrarianRole_ShouldSucceed() throws Exception {
         String token = registerAndGetToken("librarian@example.com", "LIBRARIAN");
 
-        // Önce başka bir kullanıcı oluştur
-        UserDTO newUser = new UserDTO();
-        newUser.setName("Target User");
-        newUser.setEmail("target@example.com");
-        newUser.setPhoneNumber("05551112233");
-        newUser.setRole(Role.PATRON);
+        UserCreateDTO newUser = toUserCreateDTO("New User", "target@example.com", "05551112233", Role.PATRON, "password123");
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -136,11 +124,7 @@ class UserControllerIntegrationTest {
         // LIBRARIAN ile bir kullanıcı oluştur
         String librarianToken = registerAndGetToken("librarian2@example.com", "LIBRARIAN");
 
-        UserDTO target = new UserDTO();
-        target.setName("Secret Patron");
-        target.setEmail("secret@example.com");
-        target.setPhoneNumber("05551112233");
-        target.setRole(Role.PATRON);
+        UserCreateDTO target = toUserCreateDTO("Secret Patron", "secret@example.com", "05551112233", Role.PATRON, "password");
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,14 +146,9 @@ class UserControllerIntegrationTest {
 
     @Test
     void getAllUsers_WithLibrarianRole_ShouldSucceed() throws Exception {
-        // 1 kullanıcı daha ekleyelim görünür olsun diye
         String token = registerAndGetToken("admin@example.com", "LIBRARIAN");
 
-        UserDTO newUser = new UserDTO();
-        newUser.setName("Second User");
-        newUser.setEmail("second@example.com");
-        newUser.setPhoneNumber("05551110000");
-        newUser.setRole(Role.PATRON);
+        UserCreateDTO newUser = toUserCreateDTO("Second User", "second@example.com", "05551110000", Role.PATRON, "password");
 
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -197,32 +176,39 @@ class UserControllerIntegrationTest {
     void updateUser_WithLibrarianRole_ShouldSucceed() throws Exception {
         String librarianToken = registerAndGetToken("librarian@example.com", "LIBRARIAN");
 
-        // 1. Yeni kullanıcı oluştur
-        UserDTO user = new UserDTO();
-        user.setName("UserToUpdate");
-        user.setEmail("updatable@example.com");
-        user.setPhoneNumber("05551112233");
-        user.setRole(Role.PATRON);
+        // 1. Yeni kullanıcı oluştur - UserCreateDTO kullanmalıyız!
+        UserCreateDTO createDTO = new UserCreateDTO();
+        createDTO.setName("UserToUpdate");
+        createDTO.setEmail("updatable@example.com");
+        createDTO.setPhoneNumber("05551112233");
+        createDTO.setRole(Role.PATRON);
+        createDTO.setPassword("password123"); // zorunlu alan
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + librarianToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(createDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID id = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
 
-        // 2. Güncelleme isteği
-        user.setName("Updated Name");
+        // 2. Güncelleme isteği - artık UserDTO ile yapabiliriz
+        UserDTO updateDTO = new UserDTO();
+        updateDTO.setId(id);
+        updateDTO.setName("Updated Name");
+        updateDTO.setEmail("updatable@example.com");
+        updateDTO.setPhoneNumber("05551112233");
+        updateDTO.setRole(Role.PATRON);
 
         mockMvc.perform(put("/api/users/" + id)
                         .header("Authorization", "Bearer " + librarianToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Name"));
     }
+
 
     @Test
     void updateOwnUser_WithPatronRole_ShouldSucceed() throws Exception {
@@ -250,83 +236,89 @@ class UserControllerIntegrationTest {
     void updateOtherUser_WithPatronRole_ShouldReturn403() throws Exception {
         String librarianToken = registerAndGetToken("creator@example.com", "LIBRARIAN");
 
-        // Başka kullanıcı oluştur
-        UserDTO target = new UserDTO();
-        target.setName("TargetUser");
-        target.setEmail("targetupdate@example.com");
-        target.setPhoneNumber("05551113333");
-        target.setRole(Role.PATRON);
+        // 1. Hedef kullanıcıyı oluştur - UserCreateDTO
+        UserCreateDTO createTarget = new UserCreateDTO();
+        createTarget.setName("TargetUser");
+        createTarget.setEmail("targetupdate@example.com");
+        createTarget.setPhoneNumber("05551113333");
+        createTarget.setRole(Role.PATRON);
+        createTarget.setPassword("password123");
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + librarianToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(target)))
+                        .content(objectMapper.writeValueAsString(createTarget)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID targetId = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
 
-        // Farklı PATRON login olur
+        // 2. Giriş yapan farklı PATRON
         String patronToken = registerAndGetToken("intruder@example.com", "PATRON");
 
-        // Güncelleme denemesi
-        target.setName("HACKED");
+        // 3. Hedef kullanıcıya ait UserDTO güncelleme payload
+        UserDTO targetUpdate = new UserDTO();
+        targetUpdate.setId(targetId);
+        targetUpdate.setName("HACKED");
+        targetUpdate.setEmail("targetupdate@example.com");
+        targetUpdate.setPhoneNumber("05551113333");
+        targetUpdate.setRole(Role.PATRON);
 
         mockMvc.perform(put("/api/users/" + targetId)
                         .header("Authorization", "Bearer " + patronToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(target)))
+                        .content(objectMapper.writeValueAsString(targetUpdate)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Access denied. Access Denied"));
     }
+
 
     @Test
     void deleteUser_WithLibrarianRole_ShouldSucceed() throws Exception {
         String librarianToken = registerAndGetToken("librarian@delete.com", "LIBRARIAN");
 
-        // Silinecek kullanıcıyı oluştur
-        UserDTO userToDelete = new UserDTO();
-        userToDelete.setName("To Be Deleted");
-        userToDelete.setEmail("delete@example.com");
-        userToDelete.setPhoneNumber("05551114444");
-        userToDelete.setRole(Role.PATRON);
+        UserCreateDTO createDTO = new UserCreateDTO();
+        createDTO.setName("To Be Deleted");
+        createDTO.setEmail("delete@example.com");
+        createDTO.setPhoneNumber("05551114444");
+        createDTO.setRole(Role.PATRON);
+        createDTO.setPassword("123456");
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + librarianToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userToDelete)))
+                        .content(objectMapper.writeValueAsString(createDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID userId = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
 
-        // Silme işlemi
         mockMvc.perform(delete("/api/users/" + userId)
                         .header("Authorization", "Bearer " + librarianToken))
                 .andExpect(status().isNoContent());
     }
 
+
     @Test
     void deleteUser_WithPatronRole_ShouldReturn403() throws Exception {
         String librarianToken = registerAndGetToken("creator@delete.com", "LIBRARIAN");
 
-        // Hedef kullanıcıyı oluştur
-        UserDTO target = new UserDTO();
-        target.setName("No Rights");
-        target.setEmail("nopriv@example.com");
-        target.setPhoneNumber("05551115555");
-        target.setRole(Role.PATRON);
+        UserCreateDTO createTarget = new UserCreateDTO();
+        createTarget.setName("No Rights");
+        createTarget.setEmail("nopriv@example.com");
+        createTarget.setPhoneNumber("05551115555");
+        createTarget.setRole(Role.PATRON);
+        createTarget.setPassword("secretpass");
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + librarianToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(target)))
+                        .content(objectMapper.writeValueAsString(createTarget)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         UUID targetId = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
 
-        // PATRON kullanıcı silmeye çalışır
         String patronToken = registerAndGetToken("unauthorized@delete.com", "PATRON");
 
         mockMvc.perform(delete("/api/users/" + targetId)
@@ -334,6 +326,7 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Access denied. Access Denied"));
     }
+
 
     @Test
     void getUser_NonExistent_ShouldReturn404() throws Exception {
@@ -397,6 +390,17 @@ class UserControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(invalidUser)))
                 .andExpect(status().isBadRequest());
     }
+
+    private UserCreateDTO toUserCreateDTO(String name, String email, String phone, Role role, String password) {
+        UserCreateDTO dto = new UserCreateDTO();
+        dto.setName(name);
+        dto.setEmail(email);
+        dto.setPhoneNumber(phone);
+        dto.setRole(role);
+        dto.setPassword(password);
+        return dto;
+    }
+
 
 }
 

@@ -2,6 +2,7 @@
 package com.cansuiremkanli.libmanage.controller;
 
 import com.cansuiremkanli.libmanage.core.enums.Role;
+import com.cansuiremkanli.libmanage.data.dto.UserCreateDTO;
 import com.cansuiremkanli.libmanage.data.dto.UserDTO;
 import com.cansuiremkanli.libmanage.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,13 +56,26 @@ class UserControllerTest {
     @WithMockUser(roles = "LIBRARIAN")
     @Test
     void testCreateUser() throws Exception {
-        Mockito.when(userService.createUser(any())).thenReturn(userDTO);
+        // Yeni kullanıcı oluşturmak için gereken DTO (şifre dahil)
+        UserCreateDTO userCreateDTO = new UserCreateDTO();
+        userCreateDTO.setName("Irem Kanlı");
+        userCreateDTO.setEmail("iremkanli@mail.com");
+        userCreateDTO.setPhoneNumber("5555555555");
+        userCreateDTO.setRole(Role.PATRON);
+        userCreateDTO.setPassword("password123"); // zorunlu alan
+
+        Mockito.when(userService.createUser(any())).thenReturn(userDTO); // userDTO, cevap olarak dönsün
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(userCreateDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Irem Kanlı"))
+                .andExpect(jsonPath("$.email").value("iremkanli@mail.com"))
+                .andExpect(jsonPath("$.phoneNumber").value("5555555555"))
+                .andExpect(jsonPath("$.role").value("PATRON"));
     }
+
 
     @WithMockUser(roles = "LIBRARIAN")
     @Test

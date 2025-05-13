@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -156,10 +157,11 @@ class BookControllerIntegrationTest {
     }
 
     @Test
-    void updateBook_ShouldUpdateAndPublish() throws Exception {
-        String token = registerAndGetToken("update@book.com", "LIBRARIAN");
-        BookDTO book = createSampleBookDTO();
+    void updateBook_ShouldUpdateWhenCountsAreValid() throws Exception {
+        String token = registerAndGetToken("updatevalid@book.com", "LIBRARIAN");
+        BookDTO book = createSampleBookDTO(); // örn. available=3, total=5
 
+        // Kitap ekleniyor
         MvcResult result = mockMvc.perform(post("/api/books")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -168,15 +170,46 @@ class BookControllerIntegrationTest {
                 .andReturn();
 
         UUID id = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
-        book.setAvailableCount(10);
+
+        // Geçerli güncelleme: availableCount <= totalCount
+        book.setAvailableCount(4);
+        book.setTotalCount(5);
 
         mockMvc.perform(put("/api/books/" + id)
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(book)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.availableCount").value(10));
+                .andExpect(jsonPath("$.availableCount").value(4));
     }
+
+    @Test
+    void updateBook_ShouldFailWhenAvailableCountExceedsTotalCount() throws Exception {
+        String token = registerAndGetToken("updateinvalid@book.com", "LIBRARIAN");
+        BookDTO book = createSampleBookDTO(); // örn. available=3, total=5
+
+        // Kitap ekleniyor
+        MvcResult result = mockMvc.perform(post("/api/books")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(book)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID id = UUID.fromString(objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText());
+
+        // Hatalı güncelleme: availableCount > totalCount
+        book.setAvailableCount(10);
+        book.setTotalCount(5);
+
+        mockMvc.perform(put("/api/books/" + id)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(book)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Available count cannot be greater than total count")));
+    }
+
 
     @Test
     void deleteBook_ShouldReturn204() throws Exception {

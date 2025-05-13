@@ -1,5 +1,6 @@
 package com.cansuiremkanli.libmanage.controller;
 
+import com.cansuiremkanli.libmanage.data.dto.UserCreateDTO;
 import com.cansuiremkanli.libmanage.data.dto.UserDTO;
 import com.cansuiremkanli.libmanage.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +27,11 @@ public class UserController {
     @PreAuthorize("hasRole('LIBRARIAN')")
     @PostMapping
     @Operation(summary = "Create a new user", description = "Allows librarians to create a new user.")
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
-        log.info("User creation requested for email: {}", userDTO.getEmail());
-        return ResponseEntity.ok(userService.createUser(userDTO));
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
+        log.info("User creation requested for email: {}", userCreateDTO.getEmail());
+        return ResponseEntity.ok(userService.createUser(userCreateDTO));
     }
+
 
     @PreAuthorize("hasRole('LIBRARIAN') or #id == principal.id")
     @GetMapping("/{id}")
