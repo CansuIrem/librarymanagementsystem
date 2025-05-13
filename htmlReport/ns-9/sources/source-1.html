@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookMapperImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.data.mapper</a>
+</div>
+
+<h1>Coverage Summary for Class: BookMapperImpl (com.cansuiremkanli.libmanage.data.mapper)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookMapperImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (2/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.5%
+  </span>
+  <span class="absValue">
+    (23/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.data.mapper;
+&nbsp;
+&nbsp;import com.cansuiremkanli.libmanage.data.dto.BookDTO;
+&nbsp;import com.cansuiremkanli.libmanage.data.entity.Book;
+&nbsp;import javax.annotation.processing.Generated;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;@Generated(
+&nbsp;    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+&nbsp;    date = &quot;2025-05-13T19:35:18+0300&quot;,
+&nbsp;    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.5 (Amazon.com Inc.)&quot;
+&nbsp;)
+&nbsp;@Component
+<b class="fc">&nbsp;public class BookMapperImpl implements BookMapper {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Book toEntity(BookDTO dto) {
+<b class="pc">&nbsp;        if ( dto == null ) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Book book = new Book();</b>
+&nbsp;
+<b class="fc">&nbsp;        book.setId( dto.getId() );</b>
+<b class="fc">&nbsp;        book.setTitle( dto.getTitle() );</b>
+<b class="fc">&nbsp;        book.setAuthor( dto.getAuthor() );</b>
+<b class="fc">&nbsp;        book.setIsbn( dto.getIsbn() );</b>
+<b class="fc">&nbsp;        book.setGenre( dto.getGenre() );</b>
+<b class="fc">&nbsp;        book.setTotalCount( dto.getTotalCount() );</b>
+<b class="fc">&nbsp;        book.setAvailableCount( dto.getAvailableCount() );</b>
+<b class="fc">&nbsp;        book.setPublicationDate( dto.getPublicationDate() );</b>
+&nbsp;
+<b class="fc">&nbsp;        return book;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookDTO toDTO(Book entity) {
+<b class="pc">&nbsp;        if ( entity == null ) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        BookDTO bookDTO = new BookDTO();</b>
+&nbsp;
+<b class="fc">&nbsp;        bookDTO.setId( entity.getId() );</b>
+<b class="fc">&nbsp;        bookDTO.setTitle( entity.getTitle() );</b>
+<b class="fc">&nbsp;        bookDTO.setAuthor( entity.getAuthor() );</b>
+<b class="fc">&nbsp;        bookDTO.setIsbn( entity.getIsbn() );</b>
+<b class="fc">&nbsp;        bookDTO.setGenre( entity.getGenre() );</b>
+<b class="fc">&nbsp;        bookDTO.setPublicationDate( entity.getPublicationDate() );</b>
+<b class="fc">&nbsp;        bookDTO.setAvailableCount( entity.getAvailableCount() );</b>
+<b class="fc">&nbsp;        bookDTO.setTotalCount( entity.getTotalCount() );</b>
+&nbsp;
+<b class="fc">&nbsp;        return bookDTO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateEntity(BookDTO dto, Book entity) {
+<b class="nc">&nbsp;        if ( dto == null ) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ( dto.getId() != null ) {</b>
+<b class="nc">&nbsp;            entity.setId( dto.getId() );</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ( dto.getTitle() != null ) {</b>
+<b class="nc">&nbsp;            entity.setTitle( dto.getTitle() );</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ( dto.getAuthor() != null ) {</b>
+<b class="nc">&nbsp;            entity.setAuthor( dto.getAuthor() );</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ( dto.getIsbn() != null ) {</b>
+<b class="nc">&nbsp;            entity.setIsbn( dto.getIsbn() );</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ( dto.getGenre() != null ) {</b>
+<b class="nc">&nbsp;            entity.setGenre( dto.getGenre() );</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entity.setTotalCount( dto.getTotalCount() );</b>
+<b class="nc">&nbsp;        entity.setAvailableCount( dto.getAvailableCount() );</b>
+<b class="nc">&nbsp;        if ( dto.getPublicationDate() != null ) {</b>
+<b class="nc">&nbsp;            entity.setPublicationDate( dto.getPublicationDate() );</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Book</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.data.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: Book (com.cansuiremkanli.libmanage.data.entity)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Book</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$4Tmf0ej7</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$5HlbFnDD</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$7Fae2apV</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$bZYiTk9s</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$DxarmeuN</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$HHWS5Bob</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$HrWlOqys</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateInstantiator$OPXi0t2I</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$7Uj2Ma9P</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$IOCH5uCt</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$lahI6ZWC</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$nYkaNXsr</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$W3lLwh4F</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$X6gzPOze</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$XhXb4gMR</td>
+  </tr>
+  <tr>
+    <td class="name">Book$HibernateProxy$zOCiIDvb</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.data.entity;
+&nbsp;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import lombok.Data;
+&nbsp;import lombok.EqualsAndHashCode;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="nc">&nbsp;@EqualsAndHashCode(callSuper = true)</b>
+&nbsp;@Entity
+&nbsp;@Table(name = &quot;books&quot;)
+<b class="fc">&nbsp;@Data</b>
+&nbsp;public class Book extends BaseEntity {
+&nbsp;
+&nbsp;    @Id
+&nbsp;    @GeneratedValue
+<b class="fc">&nbsp;    private UUID id;</b>
+&nbsp;
+<b class="fc">&nbsp;    private String title;</b>
+<b class="fc">&nbsp;    private String author;</b>
+&nbsp;
+&nbsp;    @Column(unique = true)
+<b class="fc">&nbsp;    private String isbn;</b>
+&nbsp;
+<b class="fc">&nbsp;    private String genre;</b>
+&nbsp;
+<b class="fc">&nbsp;    private int totalCount;</b>
+<b class="fc">&nbsp;    private int availableCount;</b>
+&nbsp;
+<b class="fc">&nbsp;    private LocalDate publicationDate;</b>
+&nbsp;
+&nbsp;    @OneToMany(mappedBy = &quot;book&quot;)
+<b class="nc">&nbsp;    private Set&lt;Borrowing&gt; borrowings;</b>
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>

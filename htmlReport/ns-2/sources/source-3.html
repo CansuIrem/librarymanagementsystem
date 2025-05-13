@@ -1,0 +1,188 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BorrowingController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: BorrowingController (com.cansuiremkanli.libmanage.controller)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BorrowingController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BorrowingController$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.controller;
+&nbsp;
+&nbsp;import com.cansuiremkanli.libmanage.data.dto.BorrowingDTO;
+&nbsp;import com.cansuiremkanli.libmanage.service.BorrowingService;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.access.prepost.PreAuthorize;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/borrowings&quot;)
+<b class="fc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@Tag(name = &quot;Borrowing Management&quot;, description = &quot;Handles borrowing and returning of books&quot;)
+&nbsp;public class BorrowingController {
+&nbsp;
+&nbsp;    private final BorrowingService borrowingService;
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;PATRON&#39;)&quot;)
+&nbsp;    @PostMapping(&quot;/borrow&quot;)
+&nbsp;    @Operation(summary = &quot;Borrow a book&quot;, description = &quot;Patrons borrow an available book&quot;)
+&nbsp;    public ResponseEntity&lt;BorrowingDTO&gt; borrowBook(
+&nbsp;            @RequestParam UUID userId,
+&nbsp;            @RequestParam UUID bookId) {
+<b class="fc">&nbsp;        log.info(&quot;User [{}] requested to borrow book [{}]&quot;, userId, bookId);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.borrowBook(userId, bookId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;PATRON&#39;)&quot;)
+&nbsp;    @PostMapping(&quot;/return/{borrowingId}&quot;)
+&nbsp;    @Operation(summary = &quot;Return a book&quot;, description = &quot;Patrons return a previously borrowed book&quot;)
+&nbsp;    public ResponseEntity&lt;BorrowingDTO&gt; returnBook(@PathVariable UUID borrowingId) {
+<b class="fc">&nbsp;        log.info(&quot;Borrowing [{}] return requested&quot;, borrowingId);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.returnBook(borrowingId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;) or #userId == principal.id&quot;)
+&nbsp;    @GetMapping(&quot;/user/{userId}&quot;)
+&nbsp;    @Operation(summary = &quot;Get user borrowing history&quot;, description = &quot;Lists all borrowings for a user&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;BorrowingDTO&gt;&gt; getUserHistory(@PathVariable UUID userId) {
+<b class="fc">&nbsp;        log.info(&quot;Fetching borrowing history for user [{}]&quot;, userId);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.getUserBorrowingHistory(userId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @GetMapping(&quot;/overdue&quot;)
+&nbsp;    @Operation(summary = &quot;Get all overdue books&quot;, description = &quot;Lists all overdue borrowings in the system&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;BorrowingDTO&gt;&gt; getOverdueBooks() {
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.getAllOverdueBooks());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @GetMapping(&quot;/overdue/report&quot;)
+&nbsp;    @Operation(summary = &quot;Overdue Borrowings Report&quot;, description = &quot;Lists all overdue borrowings with user and book details&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; getOverdueReport() {
+<b class="fc">&nbsp;        log.info(&quot;Generating overdue borrowings report&quot;);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.getOverdueReport());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @GetMapping(&quot;/stats&quot;)
+&nbsp;    @Operation(summary = &quot;Borrowing Statistics&quot;, description = &quot;Provides statistics about all borrowings in the system&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; getBorrowingStats() {
+<b class="fc">&nbsp;        log.info(&quot;Fetching borrowing statistics&quot;);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(borrowingService.getBorrowingStats());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>
