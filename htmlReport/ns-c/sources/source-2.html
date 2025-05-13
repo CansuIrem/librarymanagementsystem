@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: BookServiceImpl (com.cansuiremkanli.libmanage.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.7%
+  </span>
+  <span class="absValue">
+    (41/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.service.impl;
+&nbsp;
+&nbsp;import com.cansuiremkanli.libmanage.data.dto.BookDTO;
+&nbsp;import com.cansuiremkanli.libmanage.data.entity.Book;
+&nbsp;import com.cansuiremkanli.libmanage.data.mapper.BookMapper;
+&nbsp;import com.cansuiremkanli.libmanage.data.repository.BookRepository;
+&nbsp;import com.cansuiremkanli.libmanage.publisher.BookStockPublisher;
+&nbsp;import com.cansuiremkanli.libmanage.service.BookService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@Service
+<b class="fc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;public class BookServiceImpl implements BookService {
+&nbsp;
+&nbsp;    private final BookRepository bookRepository;
+&nbsp;    private final BookMapper bookMapper;
+&nbsp;    private final BookStockPublisher bookStockPublisher;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookDTO addBook(BookDTO bookDTO) {
+<b class="fc">&nbsp;        log.info(&quot;Adding new book: {}&quot;, bookDTO.getTitle());</b>
+&nbsp;
+<b class="fc">&nbsp;        validateBookCounts(bookDTO);</b>
+&nbsp;
+<b class="fc">&nbsp;        Book book = bookMapper.toEntity(bookDTO);</b>
+<b class="fc">&nbsp;        Book saved = bookRepository.save(book);</b>
+<b class="fc">&nbsp;        log.info(&quot;Book added successfully with ID: {}&quot;, saved.getId());</b>
+<b class="fc">&nbsp;        return bookMapper.toDTO(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookDTO updateBook(UUID id, BookDTO bookDTO) {
+<b class="fc">&nbsp;        log.info(&quot;Updating book with ID: {}&quot;, id);</b>
+&nbsp;
+<b class="fc">&nbsp;        Book book = bookRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="nc">&nbsp;                    log.warn(&quot;Book not found with ID: {}&quot;, id);</b>
+<b class="nc">&nbsp;                    return new RuntimeException(&quot;Book not found with id: &quot; + id);</b>
+&nbsp;                });
+&nbsp;
+<b class="fc">&nbsp;        validateBookCounts(bookDTO);</b>
+&nbsp;
+<b class="fc">&nbsp;        Book updatedBook = bookMapper.toEntity(bookDTO);</b>
+<b class="fc">&nbsp;        updatedBook.setId(book.getId());</b>
+<b class="fc">&nbsp;        Book updated = bookRepository.save(updatedBook);</b>
+&nbsp;
+<b class="fc">&nbsp;        log.info(&quot;Book updated successfully: ID={}, AvailableCount={}, TotalCount={}&quot;, updated.getId(), updated.getAvailableCount(), updated.getTotalCount());</b>
+&nbsp;
+<b class="fc">&nbsp;        BookDTO updatedDTO = bookMapper.toDTO(updated);</b>
+<b class="fc">&nbsp;        bookStockPublisher.publish(updatedDTO);</b>
+<b class="fc">&nbsp;        log.debug(&quot;Published updated book stock event for book ID: {}&quot;, updatedDTO.getId());</b>
+&nbsp;
+<b class="fc">&nbsp;        return updatedDTO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteBook(UUID id) {
+<b class="fc">&nbsp;        log.warn(&quot;Deleting book with ID: {}&quot;, id);</b>
+<b class="fc">&nbsp;        bookRepository.deleteById(id);</b>
+<b class="fc">&nbsp;        log.info(&quot;Book deleted successfully: {}&quot;, id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookDTO getBookById(UUID id) {
+<b class="fc">&nbsp;        log.info(&quot;Fetching book details for ID: {}&quot;, id);</b>
+<b class="fc">&nbsp;        return bookRepository.findById(id)</b>
+<b class="fc">&nbsp;                .map(book -&gt; {</b>
+<b class="fc">&nbsp;                    log.info(&quot;Book found: {}&quot;, book.getTitle());</b>
+<b class="fc">&nbsp;                    return bookMapper.toDTO(book);</b>
+&nbsp;                })
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                    log.warn(&quot;Book not found with ID: {}&quot;, id);</b>
+<b class="fc">&nbsp;                    return new RuntimeException(&quot;Book not found&quot;);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;BookDTO&gt; searchBooks(String keyword, String type, Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Searching books. Keyword: &#39;{}&#39;, Type: &#39;{}&#39;&quot;, keyword, type);</b>
+&nbsp;
+<b class="pc">&nbsp;        return switch (type.toLowerCase()) {</b>
+&nbsp;            case &quot;title&quot; -&gt; {
+<b class="fc">&nbsp;                log.debug(&quot;Searching by title...&quot;);</b>
+<b class="fc">&nbsp;                yield bookRepository.findByTitleContainingIgnoreCase(keyword, pageable).map(bookMapper::toDTO);</b>
+&nbsp;            }
+&nbsp;            case &quot;author&quot; -&gt; {
+<b class="nc">&nbsp;                log.debug(&quot;Searching by author...&quot;);</b>
+<b class="nc">&nbsp;                yield bookRepository.findByAuthorContainingIgnoreCase(keyword, pageable).map(bookMapper::toDTO);</b>
+&nbsp;            }
+&nbsp;            case &quot;isbn&quot; -&gt; {
+<b class="nc">&nbsp;                log.debug(&quot;Searching by ISBN...&quot;);</b>
+<b class="nc">&nbsp;                yield bookRepository.findByIsbnContainingIgnoreCase(keyword, pageable).map(bookMapper::toDTO);</b>
+&nbsp;            }
+&nbsp;            case &quot;genre&quot; -&gt; {
+<b class="nc">&nbsp;                log.debug(&quot;Searching by genre...&quot;);</b>
+<b class="nc">&nbsp;                yield bookRepository.findByGenreContainingIgnoreCase(keyword, pageable).map(bookMapper::toDTO);</b>
+&nbsp;            }
+&nbsp;            default -&gt; {
+<b class="fc">&nbsp;                log.error(&quot;Invalid search type: {}&quot;, type);</b>
+<b class="fc">&nbsp;                throw new IllegalArgumentException(&quot;Invalid search type&quot;);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void validateBookCounts(BookDTO bookDTO) {
+<b class="fc">&nbsp;        if (bookDTO.getAvailableCount() &gt; bookDTO.getTotalCount()) {</b>
+<b class="fc">&nbsp;            log.error(&quot;Validation failed: AvailableCount ({}) cannot exceed TotalCount ({})&quot;,</b>
+<b class="fc">&nbsp;                    bookDTO.getAvailableCount(), bookDTO.getTotalCount());</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;Available count cannot be greater than total count&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>

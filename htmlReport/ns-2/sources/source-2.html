@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: BookController (com.cansuiremkanli.libmanage.controller)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BookController$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.controller;
+&nbsp;
+&nbsp;import com.cansuiremkanli.libmanage.data.dto.BookDTO;
+&nbsp;import com.cansuiremkanli.libmanage.service.BookService;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.access.prepost.PreAuthorize;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.UUID;
+&nbsp;
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/books&quot;)
+<b class="fc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@Tag(name = &quot;Book Management&quot;, description = &quot;Operations related to book management&quot;)
+&nbsp;public class BookController {
+&nbsp;
+&nbsp;    private final BookService bookService;
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @Operation(summary = &quot;Add a Book&quot;, description = &quot;Adds a new book to the library&quot;)
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;BookDTO&gt; addBook(@Valid @RequestBody BookDTO bookDTO) {
+<b class="fc">&nbsp;        log.info(&quot;Requested to add a new book: {}&quot;, bookDTO.getTitle());</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(bookService.addBook(bookDTO));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @Operation(summary = &quot;Delete a Book&quot;, description = &quot;Deletes a book from the library by ID&quot;)
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteBook(@PathVariable UUID id) {
+<b class="fc">&nbsp;        log.warn(&quot;Requested to delete book with ID: {}&quot;, id);</b>
+<b class="fc">&nbsp;        bookService.deleteBook(id);</b>
+<b class="fc">&nbsp;        return ResponseEntity.noContent().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasAnyRole(&#39;LIBRARIAN&#39;, &#39;PATRON&#39;)&quot;)
+&nbsp;    @Operation(summary = &quot;Search Books&quot;, description = &quot;Searches books by title, author, ISBN, or genre with pagination&quot;)
+&nbsp;    @GetMapping(&quot;/search&quot;)
+&nbsp;    public ResponseEntity&lt;Page&lt;BookDTO&gt;&gt; searchBooks(
+&nbsp;            @RequestParam String keyword,
+&nbsp;            @RequestParam String type,
+&nbsp;            Pageable pageable) {
+<b class="fc">&nbsp;        log.info(&quot;Search requested for books. Keyword: &#39;{}&#39;, Type: &#39;{}&#39;&quot;, keyword, type);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(bookService.searchBooks(keyword, type, pageable));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Aşağıdaki işlemler zaten servis katmanında loglanacağı için burada ayrıca loglama gerekmez
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;LIBRARIAN&#39;)&quot;)
+&nbsp;    @Operation(summary = &quot;Update a Book&quot;, description = &quot;Updates book information by ID&quot;)
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;BookDTO&gt; updateBook(@PathVariable UUID id, @Valid @RequestBody BookDTO bookDTO) {
+<b class="fc">&nbsp;        return ResponseEntity.ok(bookService.updateBook(id, bookDTO));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PreAuthorize(&quot;hasAnyRole(&#39;LIBRARIAN&#39;, &#39;PATRON&#39;)&quot;)
+&nbsp;    @Operation(summary = &quot;Get Book Details&quot;, description = &quot;Retrieves details of a book by ID&quot;)
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;BookDTO&gt; getBookById(@PathVariable UUID id) {
+<b class="fc">&nbsp;        return ResponseEntity.ok(bookService.getBookById(id));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>

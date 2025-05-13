@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TestSecurityConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cansuiremkanli.libmanage.core.config</a>
+</div>
+
+<h1>Coverage Summary for Class: TestSecurityConfig (com.cansuiremkanli.libmanage.core.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestSecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cansuiremkanli.libmanage.core.config;
+&nbsp;
+&nbsp;import org.springframework.boot.test.context.TestConfiguration;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.security.config.Customizer;
+&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+&nbsp;import org.springframework.security.web.SecurityFilterChain;
+&nbsp;import org.springframework.test.context.ActiveProfiles;
+&nbsp;
+&nbsp;@TestConfiguration
+&nbsp;@ActiveProfiles(&quot;test&quot;)
+<b class="nc">&nbsp;public class TestSecurityConfig {</b>
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+<b class="nc">&nbsp;        http</b>
+<b class="nc">&nbsp;                .csrf(AbstractHttpConfigurer::disable)</b>
+<b class="nc">&nbsp;                .authorizeHttpRequests(auth -&gt; auth</b>
+<b class="nc">&nbsp;                        .anyRequest().permitAll()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .httpBasic(Customizer.withDefaults())</b>
+<b class="nc">&nbsp;                .formLogin(Customizer.withDefaults())</b>
+<b class="nc">&nbsp;                .headers(headers -&gt; headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // H2 Console desteği</b>
+&nbsp;
+<b class="nc">&nbsp;        return http.build();</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-13 19:36</div>
+</div>
+</body>
+</html>
